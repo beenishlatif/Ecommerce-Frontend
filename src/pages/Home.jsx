@@ -47,7 +47,7 @@ function ProductCard({ product }) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap');
 
         .pc-root {
           font-family: 'Inter', sans-serif;
@@ -132,33 +132,51 @@ function ProductCard({ product }) {
         .pc-price-block {
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: 4px;
           min-width: 0;
         }
+
+        /* Editorial micro-caption — quiet, tracked, no pill/badge shape */
+        .pc-sale-caption {
+          font-family: 'Inter', sans-serif;
+          font-size: 8.5px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #a3854f;
+        }
+
+        .pc-price-row {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          white-space: nowrap;
+        }
+
         .pc-price {
-          font-size: clamp(13px, 1vw, 15px);
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(17px, 1.3vw, 19px);
           font-weight: 600;
           color: #1a1a1a;
           letter-spacing: 0.01em;
-          white-space: nowrap;
+          line-height: 1;
         }
-        .pc-sale-meta {
-          display: flex;
-          align-items: baseline;
-          gap: 6px;
-          white-space: nowrap;
+
+        /* thin structural divider instead of a badge */
+        .pc-price-divider {
+          width: 1px;
+          height: 11px;
+          background: rgba(26,26,26,0.16);
+          flex-shrink: 0;
         }
+
         .pc-price-original {
-          font-size: 11px;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 13.5px;
           color: #a8a29a;
           text-decoration: line-through;
-          font-weight: 400;
-        }
-        .pc-discount-note {
-          font-size: 10px;
+          text-decoration-color: rgba(168,162,154,0.6);
           font-weight: 500;
-          letter-spacing: 0.03em;
-          color: #9c8659;
         }
 
         /* ── Icon-only Add-to-Cart button — below image, premium ── */
@@ -254,15 +272,20 @@ function ProductCard({ product }) {
 
             <div className="pc-bottom-row">
               <div className="pc-price-block">
-                <span className="pc-price">
-                  Rs. {product.price?.toLocaleString()}
-                </span>
                 {onSale && (
-                  <span className="pc-sale-meta">
-                    <span className="pc-price-original">Rs. {product.compareAtPrice?.toLocaleString()}</span>
-                    <span className="pc-discount-note">-{discountPercent}%</span>
-                  </span>
+                  <span className="pc-sale-caption">Sale · {discountPercent}% off</span>
                 )}
+                <div className="pc-price-row">
+                  <span className="pc-price">
+                    Rs. {product.price?.toLocaleString()}
+                  </span>
+                  {onSale && (
+                    <>
+                      <span className="pc-price-divider" />
+                      <span className="pc-price-original">Rs. {product.compareAtPrice?.toLocaleString()}</span>
+                    </>
+                  )}
+                </div>
               </div>
 
               {outOfStock ? (
