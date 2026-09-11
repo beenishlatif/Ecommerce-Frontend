@@ -39,18 +39,15 @@ const links = [
   { to: '/contact', label: 'Contact', icon: Mail },
 ];
 
-// Bottom shortcut bar (mobile only) — icon-only, one tap to any page.
-// Every primary destination lives here now, so the drawer becomes optional
-// rather than required for everyday navigation.
+// Bottom shortcut bar (mobile only) — kept to the handful of pages people
+// reach for constantly. Everything else (Categories, About, Contact,
+// Search) still lives in the top bar and the drawer.
 const shortcuts = [
   { to: '/', label: 'Home', icon: HomeIcon },
   { to: '/shop', label: 'Shop', icon: Store },
-  { to: '/categories', label: 'Categories', icon: Grid3x3 },
-  { to: '/about', label: 'About', icon: Info },
-  { to: '/contact', label: 'Contact', icon: Mail },
-  { to: '/search', label: 'Search', icon: Search },
   { to: '/wishlist', label: 'Wishlist', icon: Heart },
   { to: '/cart', label: 'Cart', icon: ShoppingBag },
+  { to: '/profile', label: 'Profile', icon: User },
 ];
 
 export default function Navbar() {
@@ -88,9 +85,9 @@ export default function Navbar() {
   // page content in the DOM, which is exactly what was causing the large
   // empty gap right below the navbar on mobile.
   useEffect(() => {
-    document.body.classList.add('pb-[54px]', 'lg:pb-0');
+    document.body.classList.add('pb-[62px]', 'lg:pb-0');
     return () => {
-      document.body.classList.remove('pb-[54px]', 'lg:pb-0');
+      document.body.classList.remove('pb-[62px]', 'lg:pb-0');
     };
   }, []);
 
@@ -376,52 +373,65 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Bottom shortcut bar — mobile only, fixed, icon-only.
-          Truly responsive across any phone width (iPhone SE ~320px up to
-          Android/iPhone Pro Max and small tablets): items keep a minimum
-          44px touch target and the row scrolls horizontally as a safety
-          net on the narrowest devices instead of squeezing or clipping. */}
+      {/* Bottom shortcut bar — mobile only, fixed. Kept to five essential
+          pages with icon + label for a premium, legible feel rather than a
+          crowded icon-only strip. Minimum 44px touch targets, horizontal
+          scroll as a safety net on the narrowest devices. */}
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-cream-50/95 backdrop-blur-md border-t border-charcoal-900/[0.06] shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
         <style>{`
           .bottom-nav-track::-webkit-scrollbar { display: none; }
           .bottom-nav-track { scrollbar-width: none; -ms-overflow-style: none; }
         `}</style>
-        <div className="bottom-nav-track flex items-center justify-between overflow-x-auto px-1 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
-          {shortcuts.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              aria-label={label}
-              className={({ isActive }) =>
-                `relative flex flex-col items-center justify-center shrink-0 min-w-[44px] py-1.5 transition-colors ${
-                  isActive ? 'text-blush-500' : 'text-charcoal-500'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <span
-                    className={`relative flex items-center justify-center h-8 w-8 rounded-full transition-all duration-200 ${
-                      isActive ? 'bg-blush-50 scale-105' : ''
-                    }`}
-                  >
-                    <Icon className="h-[18px] w-[18px]" strokeWidth={isActive ? 2 : 1.75} />
-                    {to === '/cart' && itemCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-[14px] min-w-[14px] px-[3px] rounded-full bg-blush-500 text-[8.5px] font-semibold leading-[14px] text-white text-center shadow-sm ring-2 ring-cream-50">
-                        {itemCount}
-                      </span>
+        <div className="bottom-nav-track flex items-center justify-between overflow-x-auto px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+          {shortcuts.map(({ to, label, icon: Icon }) => {
+            const href = to === '/profile' ? (user ? '/profile' : '/login') : to;
+            return (
+              <NavLink
+                key={to}
+                to={href}
+                aria-label={label}
+                className={({ isActive }) =>
+                  `relative flex flex-col items-center justify-center gap-1 shrink-0 min-w-[52px] py-1.5 transition-colors duration-200 ${
+                    isActive ? 'text-blush-500' : 'text-charcoal-500'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <span
+                      className={`relative flex items-center justify-center h-9 w-9 rounded-full transition-all duration-300 ease-out ${
+                        isActive ? 'bg-blush-50' : ''
+                      }`}
+                    >
+                      <Icon
+                        className="h-[19px] w-[19px] transition-transform duration-300"
+                        strokeWidth={isActive ? 2 : 1.6}
+                        style={{ transform: isActive ? 'scale(1.06)' : 'scale(1)' }}
+                      />
+                      {to === '/cart' && itemCount > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 h-[14px] min-w-[14px] px-[3px] rounded-full bg-blush-500 text-[8.5px] font-semibold leading-[14px] text-white text-center shadow-sm ring-2 ring-cream-50">
+                          {itemCount}
+                        </span>
+                      )}
+                    </span>
+                    <span
+                      className={`text-[9.5px] tracking-wide transition-all duration-200 ${
+                        isActive ? 'font-semibold opacity-100' : 'font-medium opacity-70'
+                      }`}
+                    >
+                      {label}
+                    </span>
+                    {isActive && (
+                      <motion.span
+                        layoutId="bottom-nav-dot"
+                        className="absolute -top-2 h-1 w-1 rounded-full bg-blush-500"
+                      />
                     )}
-                  </span>
-                  {isActive && (
-                    <motion.span
-                      layoutId="bottom-nav-dot"
-                      className="absolute -top-1 h-1 w-1 rounded-full bg-blush-500"
-                    />
-                  )}
-                </>
-              )}
-            </NavLink>
-          ))}
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
         </div>
       </nav>
     </>
