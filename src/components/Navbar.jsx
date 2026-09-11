@@ -205,7 +205,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
-              className="fixed inset-y-0 left-0 w-[82%] max-w-xs bg-cream-50 lg:hidden z-[70] shadow-2xl flex flex-col"
+              className="fixed inset-y-0 left-0 w-[85%] max-w-[340px] bg-cream-50 lg:hidden z-[70] shadow-2xl flex flex-col"
             >
               <div className="flex items-center justify-between px-6 pt-6 pb-5 border-b border-charcoal-900/[0.06]">
                 <span className="text-xl font-display font-semibold tracking-[0.08em] text-charcoal-800">
@@ -376,17 +376,24 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Bottom shortcut bar — mobile only, fixed, icon-only for compact,
-          one-tap access to every primary page */}
+      {/* Bottom shortcut bar — mobile only, fixed, icon-only.
+          Truly responsive across any phone width (iPhone SE ~320px up to
+          Android/iPhone Pro Max and small tablets): items keep a minimum
+          44px touch target and the row scrolls horizontally as a safety
+          net on the narrowest devices instead of squeezing or clipping. */}
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-cream-50/95 backdrop-blur-md border-t border-charcoal-900/[0.06] shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
-        <div className="flex items-center justify-between px-1.5 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+        <style>{`
+          .bottom-nav-track::-webkit-scrollbar { display: none; }
+          .bottom-nav-track { scrollbar-width: none; -ms-overflow-style: none; }
+        `}</style>
+        <div className="bottom-nav-track flex items-center justify-between overflow-x-auto px-1 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
           {shortcuts.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               aria-label={label}
               className={({ isActive }) =>
-                `relative flex-1 flex flex-col items-center justify-center py-1.5 transition-colors ${
+                `relative flex flex-col items-center justify-center shrink-0 min-w-[44px] py-1.5 transition-colors ${
                   isActive ? 'text-blush-500' : 'text-charcoal-500'
                 }`
               }
