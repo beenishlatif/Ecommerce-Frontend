@@ -108,26 +108,6 @@ function ProductCard({ product }) {
           padding: 12px 1px 0;
         }
 
-        .pc-sale-row {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          margin-bottom: 6px;
-        }
-        .pc-badge-sale-below {
-          font-size: 9.5px;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          color: #b3462f;
-          text-transform: uppercase;
-        }
-        .pc-price-original {
-          font-size: 11.5px;
-          color: #a8a29a;
-          text-decoration: line-through;
-          font-weight: 400;
-        }
-
         .pc-name {
           font-size: clamp(12.5px, 1vw, 14px);
           font-weight: 400;
@@ -146,13 +126,40 @@ function ProductCard({ product }) {
           justify-content: space-between;
           gap: 10px;
         }
+
+        /* Price stacks in a column — stays clean at any card width,
+           no side-by-side wrapping that breaks on narrow mobile cards */
+        .pc-price-block {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 0;
+        }
         .pc-price {
           font-size: clamp(13px, 1vw, 15px);
           font-weight: 600;
           color: #1a1a1a;
           letter-spacing: 0.01em;
+          white-space: nowrap;
         }
-        .pc-price.sale { color: #b3462f; }
+        .pc-sale-meta {
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+          white-space: nowrap;
+        }
+        .pc-price-original {
+          font-size: 11px;
+          color: #a8a29a;
+          text-decoration: line-through;
+          font-weight: 400;
+        }
+        .pc-discount-note {
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.03em;
+          color: #9c8659;
+        }
 
         /* ── Icon-only Add-to-Cart button — below image, premium ── */
         .pc-cart-btn {
@@ -243,19 +250,20 @@ function ProductCard({ product }) {
           </div>
 
           <div className="pc-info">
-            {onSale && (
-              <div className="pc-sale-row">
-                <span className="pc-badge-sale-below">-{discountPercent}%</span>
-                <span className="pc-price-original">Rs. {product.compareAtPrice?.toLocaleString()}</span>
-              </div>
-            )}
-
             <p className="pc-name">{product.name}</p>
 
             <div className="pc-bottom-row">
-              <span className={`pc-price ${onSale ? 'sale' : ''}`}>
-                Rs. {product.price?.toLocaleString()}
-              </span>
+              <div className="pc-price-block">
+                <span className="pc-price">
+                  Rs. {product.price?.toLocaleString()}
+                </span>
+                {onSale && (
+                  <span className="pc-sale-meta">
+                    <span className="pc-price-original">Rs. {product.compareAtPrice?.toLocaleString()}</span>
+                    <span className="pc-discount-note">-{discountPercent}%</span>
+                  </span>
+                )}
+              </div>
 
               {outOfStock ? (
                 <span className="pc-oos">Out of stock</span>
