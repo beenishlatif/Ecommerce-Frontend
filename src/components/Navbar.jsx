@@ -39,15 +39,15 @@ const links = [
   { to: '/contact', label: 'Contact', icon: Mail },
 ];
 
-// Bottom shortcut bar (mobile only) — kept to the handful of pages people
-// reach for constantly. Everything else (Categories, About, Contact,
-// Search) still lives in the top bar and the drawer.
+// Bottom shortcut bar (mobile only) — kept to five pages people browse
+// most. Cart and Profile are reachable from the top bar on every screen,
+// so the bottom bar focuses on browsing entry points instead.
 const shortcuts = [
   { to: '/', label: 'Home', icon: HomeIcon },
   { to: '/shop', label: 'Shop', icon: Store },
+  { to: '/categories', label: 'Categories', icon: Grid3x3 },
   { to: '/wishlist', label: 'Wishlist', icon: Heart },
-  { to: '/cart', label: 'Cart', icon: ShoppingBag },
-  { to: '/profile', label: 'Profile', icon: User },
+  { to: '/contact', label: 'Contact', icon: Mail },
 ];
 
 export default function Navbar() {
@@ -383,55 +383,47 @@ export default function Navbar() {
           .bottom-nav-track { scrollbar-width: none; -ms-overflow-style: none; }
         `}</style>
         <div className="bottom-nav-track flex items-center justify-between overflow-x-auto px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
-          {shortcuts.map(({ to, label, icon: Icon }) => {
-            const href = to === '/profile' ? (user ? '/profile' : '/login') : to;
-            return (
-              <NavLink
-                key={to}
-                to={href}
-                aria-label={label}
-                className={({ isActive }) =>
-                  `relative flex flex-col items-center justify-center gap-1 shrink-0 min-w-[52px] py-1.5 transition-colors duration-200 ${
-                    isActive ? 'text-blush-500' : 'text-charcoal-500'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <span
-                      className={`relative flex items-center justify-center h-9 w-9 rounded-full transition-all duration-300 ease-out ${
-                        isActive ? 'bg-blush-50' : ''
-                      }`}
-                    >
-                      <Icon
-                        className="h-[19px] w-[19px] transition-transform duration-300"
-                        strokeWidth={isActive ? 2 : 1.6}
-                        style={{ transform: isActive ? 'scale(1.06)' : 'scale(1)' }}
-                      />
-                      {to === '/cart' && itemCount > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 h-[14px] min-w-[14px] px-[3px] rounded-full bg-blush-500 text-[8.5px] font-semibold leading-[14px] text-white text-center shadow-sm ring-2 ring-cream-50">
-                          {itemCount}
-                        </span>
-                      )}
-                    </span>
-                    <span
-                      className={`text-[9.5px] tracking-wide transition-all duration-200 ${
-                        isActive ? 'font-semibold opacity-100' : 'font-medium opacity-70'
-                      }`}
-                    >
-                      {label}
-                    </span>
-                    {isActive && (
-                      <motion.span
-                        layoutId="bottom-nav-dot"
-                        className="absolute -top-2 h-1 w-1 rounded-full bg-blush-500"
-                      />
-                    )}
-                  </>
-                )}
-              </NavLink>
-            );
-          })}
+          {shortcuts.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              aria-label={label}
+              className={({ isActive }) =>
+                `relative flex flex-col items-center justify-center gap-1 shrink-0 min-w-[52px] py-1.5 transition-colors duration-200 ${
+                  isActive ? 'text-blush-500' : 'text-charcoal-500'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={`relative flex items-center justify-center h-9 w-9 rounded-full transition-all duration-300 ease-out ${
+                      isActive ? 'bg-blush-50' : ''
+                    }`}
+                  >
+                    <Icon
+                      className="h-[19px] w-[19px] transition-transform duration-300"
+                      strokeWidth={isActive ? 2 : 1.6}
+                      style={{ transform: isActive ? 'scale(1.06)' : 'scale(1)' }}
+                    />
+                  </span>
+                  <span
+                    className={`text-[9.5px] tracking-wide transition-all duration-200 ${
+                      isActive ? 'font-semibold opacity-100' : 'font-medium opacity-70'
+                    }`}
+                  >
+                    {label}
+                  </span>
+                  {isActive && (
+                    <motion.span
+                      layoutId="bottom-nav-dot"
+                      className="absolute -top-2 h-1 w-1 rounded-full bg-blush-500"
+                    />
+                  )}
+                </>
+              )}
+            </NavLink>
+          ))}
         </div>
       </nav>
     </>
