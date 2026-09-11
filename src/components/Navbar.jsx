@@ -1,26 +1,42 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Heart, User, Search, Menu, X, ChevronDown, Home as HomeIcon, Grid3x3 } from 'lucide-react';
+import {
+  ShoppingBag,
+  Heart,
+  User,
+  Search,
+  Menu,
+  X,
+  ChevronDown,
+  Home as HomeIcon,
+  Grid3x3,
+  Store,
+  Info,
+  Mail,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
 
 // Links can optionally carry `children` (subcategories). The expand arrow
 // only ever renders on an item that itself has children — a subcategory
 // with no further children (e.g. Men, Women) renders as a plain row.
+// Each top-level link also carries an `icon` — used in the mobile drawer
+// so every row reads as icon + label, matching the bottom shortcut bar.
 const links = [
-  { to: '/', label: 'Home' },
-  { to: '/shop', label: 'Shop' },
+  { to: '/', label: 'Home', icon: HomeIcon },
+  { to: '/shop', label: 'Shop', icon: Store },
   {
     to: '/categories',
     label: 'Categories',
+    icon: Grid3x3,
     children: [
       { to: '/categories/men', label: 'Men' },
       { to: '/categories/women', label: 'Women' },
     ],
   },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
+  { to: '/about', label: 'About', icon: Info },
+  { to: '/contact', label: 'Contact', icon: Mail },
 ];
 
 // Bottom shortcut bar (mobile only) — the fast-access equivalent of a native
@@ -201,10 +217,22 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-6 py-4">
+              {/* Quiet section caption — premium editorial touch, matches the
+                  tracked micro-labels used elsewhere in the app */}
+              <div className="px-6 pt-5 pb-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-charcoal-400">
+                  Menu
+                </span>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-6 py-2">
                 {links.map((link, i) => {
                   const hasChildren = Boolean(link.children?.length);
                   const isExpanded = expanded === link.to;
+                  const Icon = link.icon;
+                  const isTopActive =
+                    location.pathname === link.to ||
+                    (hasChildren && link.children.some((c) => location.pathname === c.to));
 
                   return (
                     <motion.div
@@ -219,9 +247,26 @@ export default function Navbar() {
                             type="button"
                             onClick={() => setExpanded(isExpanded ? null : link.to)}
                             aria-expanded={isExpanded}
-                            className="w-full flex items-center justify-between py-3.5 border-b border-charcoal-900/[0.06] text-base font-medium text-charcoal-700"
+                            className="w-full flex items-center justify-between py-3 border-b border-charcoal-900/[0.06] group"
                           >
-                            <span className={isExpanded ? 'text-charcoal-900' : ''}>{link.label}</span>
+                            <span className="flex items-center gap-3.5">
+                              <span
+                                className={`h-9 w-9 rounded-full flex items-center justify-center transition-colors duration-200 ${
+                                  isTopActive || isExpanded
+                                    ? 'bg-blush-500 text-white'
+                                    : 'bg-charcoal-900/[0.04] text-charcoal-500 group-hover:bg-charcoal-900/[0.07]'
+                                }`}
+                              >
+                                <Icon className="h-4 w-4" strokeWidth={1.75} />
+                              </span>
+                              <span
+                                className={`text-[15px] font-medium transition-colors ${
+                                  isExpanded ? 'text-charcoal-900' : 'text-charcoal-700'
+                                }`}
+                              >
+                                {link.label}
+                              </span>
+                            </span>
                             <ChevronDown
                               className={`h-4 w-4 text-charcoal-400 transition-transform duration-300 ease-out ${
                                 isExpanded ? 'rotate-180' : ''
@@ -241,8 +286,8 @@ export default function Navbar() {
                               >
                                 {/* Editorial-style sublist: a thin connecting rule down the left,
                                     each row a plain label — no pills, no rings, no backgrounds. */}
-                                <div className="relative pl-5 py-1">
-                                  <span className="absolute left-[3px] top-1 bottom-1 w-px bg-charcoal-900/10" />
+                                <div className="relative pl-[3.25rem] py-1">
+                                  <span className="absolute left-[2.6rem] top-1 bottom-1 w-px bg-charcoal-900/10" />
                                   {link.children.map((child, ci) => (
                                     <motion.div
                                       key={child.to}
@@ -255,7 +300,7 @@ export default function Navbar() {
                                         to={child.to}
                                         onClick={() => setOpen(false)}
                                         className={({ isActive }) =>
-                                          `group relative flex items-center py-2.5 text-[15px] transition-colors ${
+                                          `group relative flex items-center py-2.5 text-[14px] transition-colors ${
                                             isActive ? 'text-charcoal-900 font-medium' : 'text-charcoal-400 hover:text-charcoal-800'
                                           }`
                                         }
@@ -282,13 +327,28 @@ export default function Navbar() {
                         <NavLink
                           to={link.to}
                           onClick={() => setOpen(false)}
-                          className={({ isActive }) =>
-                            `flex items-center py-3.5 border-b border-charcoal-900/[0.06] text-base font-medium transition-colors ${
-                              isActive ? 'text-blush-500' : 'text-charcoal-700'
-                            }`
-                          }
+                          className="group flex items-center gap-3.5 py-3 border-b border-charcoal-900/[0.06]"
                         >
-                          {link.label}
+                          {({ isActive }) => (
+                            <>
+                              <span
+                                className={`h-9 w-9 rounded-full flex items-center justify-center transition-colors duration-200 ${
+                                  isActive
+                                    ? 'bg-blush-500 text-white'
+                                    : 'bg-charcoal-900/[0.04] text-charcoal-500 group-hover:bg-charcoal-900/[0.07]'
+                                }`}
+                              >
+                                <Icon className="h-4 w-4" strokeWidth={1.75} />
+                              </span>
+                              <span
+                                className={`text-[15px] font-medium transition-colors ${
+                                  isActive ? 'text-blush-500' : 'text-charcoal-700'
+                                }`}
+                              >
+                                {link.label}
+                              </span>
+                            </>
+                          )}
                         </NavLink>
                       )}
                     </motion.div>
