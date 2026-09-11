@@ -15,15 +15,13 @@ function topLevelCategories(categories) {
 }
 
 /* ─────────────────────────────────────────────
-   PRODUCT CARD — redesigned
-   Rules from brief:
-   • "New" badge on new products (top-left)
-   • Sale badge: pill below image, left-aligned
-     with original price struck through
-   • "Add To Cart" button below image, right-aligned
-   • Card is clean, no rounded-3xl overflow clipping
-     — image sits edge-to-edge in a square frame
-   • Hover: subtle lift + image scale
+   PRODUCT CARD — v2 (premium, unique)
+   • Badges (New / Sale %) stay minimal, top-left over image ONLY
+   • Add To Cart moved BELOW image — circular icon button
+     sitting in the price row, no generic pill/overlay
+   • Grid fixed: no inline gridTemplateColumns override,
+     proper Tailwind responsive columns (2 → 3 → 4 → 5)
+     so cards don't blow up on laptop/desktop widths
 ───────────────────────────────────────────── */
 function ProductCard({ product }) {
   const { addItem } = useCart();
@@ -34,14 +32,13 @@ function ProductCard({ product }) {
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;
 
-  // treat "new" as products with a createdAt within last 30 days,
-  // or if the API exposes product.isNew
   const isNew = product.isNew || false;
+  const outOfStock = product.stock === 0;
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (product.stock === 0) return;
+    if (outOfStock || added) return;
     addItem(product, 1, { size: product.sizes?.[0] || '', color: product.colors?.[0] || '' });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
@@ -50,207 +47,190 @@ function ProductCard({ product }) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         .pc-root {
           font-family: 'Inter', sans-serif;
-          position: relative;
-          cursor: pointer;
+          width: 100%;
         }
 
         /* ── Image wrapper ── */
         .pc-img-wrap {
           position: relative;
-          aspect-ratio: 4 / 5;
+          aspect-ratio: 3 / 4;
           overflow: hidden;
           background: #f5f2ee;
-          border-radius: 4px;
         }
         .pc-img-wrap img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           display: block;
-          transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .pc-root:hover .pc-img-wrap img {
-          transform: scale(1.05);
+          transform: scale(1.045);
         }
-
-        /* ── "New" badge — top left over image ── */
-        .pc-badge-new {
+        .pc-img-wrap::after {
+          content: '';
           position: absolute;
-          top: 10px;
-          left: 10px;
-          z-index: 2;
-          background: #ffffff;
-          color: #1a1a1a;
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.05em;
-          padding: 3px 9px;
-          border-radius: 20px;
-          border: 1px solid rgba(0,0,0,0.12);
-          line-height: 1.6;
+          inset: 0;
+          box-shadow: inset 0 0 0 1px rgba(26,26,26,0.06);
+          pointer-events: none;
         }
 
-        /* ── Sale % badge — top left over image (when no New) ── */
+        /* ── Badges — top left over image only ── */
+        .pc-badge-new,
         .pc-badge-sale-img {
           position: absolute;
           top: 10px;
           left: 10px;
           z-index: 2;
-          background: #1a1a1a;
-          color: #fff;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.04em;
-          padding: 3px 9px;
-          border-radius: 20px;
-          line-height: 1.6;
+          font-size: 9.5px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          padding: 4px 9px;
+          line-height: 1.5;
         }
-
-        /* ── "Add To Cart" button — bottom right, always visible on desktop hover ── */
-        .pc-atc {
-          position: absolute;
-          bottom: 10px;
-          right: 10px;
-          z-index: 3;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: rgba(255,255,255,0.95);
+        .pc-badge-new {
+          background: #fff;
           color: #1a1a1a;
           border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 20px;
-          padding: 6px 14px;
-          font-family: 'Inter', sans-serif;
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.04em;
-          cursor: pointer;
-          backdrop-filter: blur(6px);
-          opacity: 0;
-          transform: translateY(4px);
-          transition: opacity 0.22s ease, transform 0.22s ease, background 0.15s;
-          white-space: nowrap;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.12);
         }
-        .pc-root:hover .pc-atc {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        /* always visible on touch / mobile */
-        @media (hover: none) {
-          .pc-atc { opacity: 1; transform: translateY(0); }
-        }
-        .pc-atc:hover {
+        .pc-badge-sale-img {
           background: #1a1a1a;
           color: #fff;
-          border-color: #1a1a1a;
-        }
-        .pc-atc:disabled {
-          opacity: 0.45 !important;
-          cursor: not-allowed;
-          pointer-events: none;
-        }
-        .pc-atc.added {
-          background: #1a7a4a;
-          color: #fff;
-          border-color: #1a7a4a;
         }
 
-        /* ── Info row below image ── */
+        /* ── Info below image ── */
         .pc-info {
-          padding: 10px 2px 0;
+          padding: 12px 1px 0;
         }
 
-        /* Sale row: badge + original price + add-to-cart (on mobile) */
         .pc-sale-row {
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          gap: 7px;
           margin-bottom: 6px;
         }
-        .pc-sale-left {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        /* Sale price pill below image */
         .pc-badge-sale-below {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          background: #fff0f0;
-          color: #c0392b;
-          border: 1px solid rgba(192,57,43,0.18);
-          border-radius: 20px;
-          font-size: 10px;
+          font-size: 9.5px;
           font-weight: 700;
-          padding: 2px 8px;
-          letter-spacing: 0.03em;
-          line-height: 1.6;
-          white-space: nowrap;
+          letter-spacing: 0.05em;
+          color: #b3462f;
+          text-transform: uppercase;
         }
         .pc-price-original {
-          font-size: 12px;
-          color: #999;
+          font-size: 11.5px;
+          color: #a8a29a;
           text-decoration: line-through;
           font-weight: 400;
         }
 
-        /* Mobile add-to-cart (always visible, below info) */
-        .pc-atc-mobile {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: transparent;
-          color: #1a1a1a;
-          border: 1px solid rgba(0,0,0,0.18);
-          border-radius: 20px;
-          padding: 5px 12px;
-          font-family: 'Inter', sans-serif;
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.04em;
-          cursor: pointer;
-          transition: background 0.15s, color 0.15s;
-          white-space: nowrap;
-        }
-        .pc-atc-mobile:hover { background: #1a1a1a; color: #fff; }
-        .pc-atc-mobile:disabled { opacity: 0.4; cursor: not-allowed; }
-        .pc-atc-mobile.added { background: #1a7a4a; color: #fff; border-color: #1a7a4a; }
-
         .pc-name {
-          font-size: 13px;
+          font-size: clamp(12.5px, 1vw, 14px);
           font-weight: 400;
-          color: #1a1a1a;
-          line-height: 1.45;
-          margin-bottom: 5px;
+          color: #2b2926;
+          line-height: 1.4;
+          margin: 0 0 8px;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        .pc-price-row {
+
+        .pc-bottom-row {
           display: flex;
           align-items: center;
-          gap: 8px;
+          justify-content: space-between;
+          gap: 10px;
         }
         .pc-price {
-          font-size: 13px;
+          font-size: clamp(13px, 1vw, 15px);
           font-weight: 600;
           color: #1a1a1a;
+          letter-spacing: 0.01em;
         }
-        .pc-price.sale { color: #c0392b; }
+        .pc-price.sale { color: #b3462f; }
+
+        /* ── Icon-only Add-to-Cart button — below image, premium ── */
+        .pc-cart-btn {
+          position: relative;
+          flex-shrink: 0;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          border: 1px solid rgba(26,26,26,0.18);
+          background: transparent;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          overflow: hidden;
+          transition: border-color 0.3s ease, background 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .pc-cart-btn::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: #1a1a1a;
+          transform: scale(0);
+          transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .pc-cart-btn:hover:not(:disabled)::before {
+          transform: scale(1);
+        }
+        .pc-cart-btn svg {
+          position: relative;
+          z-index: 1;
+          color: #1a1a1a;
+          transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .pc-cart-btn:hover:not(:disabled) svg {
+          color: #fff;
+        }
+        .pc-cart-btn:active:not(:disabled) svg {
+          transform: scale(0.88);
+        }
+        .pc-cart-btn:disabled {
+          opacity: 0.35;
+          cursor: not-allowed;
+        }
+
+        .pc-cart-btn.added {
+          border-color: #1a1a1a;
+        }
+        .pc-cart-btn.added::before {
+          transform: scale(1);
+          background: #1a1a1a;
+        }
+        .pc-cart-btn.added svg { color: #fff; }
+        .pc-cart-btn.added::after {
+          content: '';
+          position: absolute;
+          inset: -1px;
+          border-radius: 50%;
+          border: 1px solid #1a1a1a;
+          animation: pc-pulse 0.6s ease-out;
+        }
+        @keyframes pc-pulse {
+          0% { transform: scale(1); opacity: 0.6; }
+          100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        .pc-oos {
+          font-size: 10px;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: #a8a29a;
+          white-space: nowrap;
+        }
       `}</style>
 
       <div className="pc-root group">
         <Link to={`/product/${product.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-
-          {/* ── Image frame ── */}
           <div className="pc-img-wrap">
             {product.images?.[0] ? (
               <img src={product.images[0]} alt={product.name} />
@@ -258,65 +238,38 @@ function ProductCard({ product }) {
               <div style={{ width: '100%', height: '100%', background: '#ede8e0' }} />
             )}
 
-            {/* Badges over image: New takes priority, then sale % */}
-            {isNew && !onSale && (
-              <span className="pc-badge-new">New</span>
-            )}
-            {isNew && onSale && (
-              <span className="pc-badge-new">New</span>
-            )}
-            {onSale && !isNew && (
-              <span className="pc-badge-sale-img">-{discountPercent}%</span>
-            )}
-
-            {/* Add to cart — desktop hover */}
-            <button
-              className={`pc-atc ${added ? 'added' : ''}`}
-              onClick={handleQuickAdd}
-              disabled={product.stock === 0}
-              type="button"
-            >
-              {added ? (
-                <><Check size={12} /> Added</>
-              ) : product.stock === 0 ? (
-                'Out of Stock'
-              ) : (
-                <><ShoppingBag size={12} /> Add To Cart</>
-              )}
-            </button>
+            {isNew && <span className="pc-badge-new">New</span>}
+            {onSale && !isNew && <span className="pc-badge-sale-img">-{discountPercent}%</span>}
           </div>
 
-          {/* ── Info below image ── */}
           <div className="pc-info">
-
-            {/* Sale row: pill + strikethrough + mobile cart btn */}
             {onSale && (
               <div className="pc-sale-row">
-                <div className="pc-sale-left">
-                  <span className="pc-badge-sale-below">-{discountPercent}%</span>
-                  <span className="pc-price-original">Rs. {product.compareAtPrice?.toLocaleString()}</span>
-                </div>
-                {/* mobile always-visible add-to-cart */}
-                <button
-                  className={`pc-atc-mobile ${added ? 'added' : ''}`}
-                  onClick={handleQuickAdd}
-                  disabled={product.stock === 0}
-                  type="button"
-                  style={{ display: 'none' }}  /* shown via media query below */
-                >
-                  {added ? <><Check size={11} /> Added</> : <><ShoppingBag size={11} /> Add To Cart</>}
-                </button>
+                <span className="pc-badge-sale-below">-{discountPercent}%</span>
+                <span className="pc-price-original">Rs. {product.compareAtPrice?.toLocaleString()}</span>
               </div>
             )}
 
-            {/* Product name */}
             <p className="pc-name">{product.name}</p>
 
-            {/* Price row */}
-            <div className="pc-price-row">
+            <div className="pc-bottom-row">
               <span className={`pc-price ${onSale ? 'sale' : ''}`}>
                 Rs. {product.price?.toLocaleString()}
               </span>
+
+              {outOfStock ? (
+                <span className="pc-oos">Out of stock</span>
+              ) : (
+                <button
+                  className={`pc-cart-btn ${added ? 'added' : ''}`}
+                  onClick={handleQuickAdd}
+                  disabled={added}
+                  type="button"
+                  aria-label={added ? 'Added to cart' : 'Add to cart'}
+                >
+                  {added ? <Check size={14} strokeWidth={2.4} /> : <ShoppingBag size={14} strokeWidth={1.8} />}
+                </button>
+              )}
             </div>
           </div>
         </Link>
@@ -327,13 +280,7 @@ function ProductCard({ product }) {
 
 function ProductGrid({ products }) {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(2, 1fr)',
-      gap: '20px 16px',
-    }}
-      className="sm:grid-cols-3 md:grid-cols-4 lg:gap-x-6 lg:gap-y-8"
-    >
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 sm:gap-x-5 lg:gap-x-6 lg:gap-y-10">
       {products.map((product) => (
         <ProductCard key={product._id} product={product} />
       ))}
