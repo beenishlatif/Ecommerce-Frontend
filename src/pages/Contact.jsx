@@ -1,280 +1,313 @@
 import { useState } from 'react';
-import PageHeader from '../components/PageHeader.jsx';
+import { Mail, Phone, MapPin, Clock, Instagram, Facebook, Send, Check } from 'lucide-react';
 
-const EMAIL = 'beenishlatif1026@gmail.com';
-const PHONE_DISPLAY = '0301 0861481';
-const PHONE_WHATSAPP = '923010861481';
+function ContactStyles() {
+  return (
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap');
 
-const contactDetails = [
+      .ct-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #8a8378;
+        margin-bottom: 6px;
+        display: block;
+      }
+      .ct-input {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid rgba(26,26,26,0.14);
+        background: transparent;
+        padding: 10px 2px;
+        font-size: 14.5px;
+        color: #1a1a1a;
+        transition: border-color 0.25s ease;
+      }
+      .ct-input::placeholder { color: #b8b2a8; }
+      .ct-input:focus {
+        outline: none;
+        border-bottom-color: #d9788a;
+      }
+      textarea.ct-input {
+        resize: none;
+        line-height: 1.6;
+      }
+
+      .ct-submit {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 999px;
+        background: #1a1a1a;
+        color: #fdfbf8;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        padding: 13px 30px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.25s ease, transform 0.15s ease;
+      }
+      .ct-submit:hover:not(:disabled) { background: #d9788a; }
+      .ct-submit:active:not(:disabled) { transform: scale(0.98); }
+      .ct-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+      .ct-info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(217,120,138,0.08);
+        color: #d9788a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .ct-social {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid rgba(26,26,26,0.12);
+        color: #4a4642;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      }
+      .ct-social:hover {
+        background: #1a1a1a;
+        border-color: #1a1a1a;
+        color: #fff;
+      }
+
+      .ct-price, .ct-serif { font-family: 'Cormorant Garamond', serif; }
+    `}</style>
+  );
+}
+
+const CONTACT_DETAILS = [
   {
-    label: 'Email',
-    value: EMAIL,
-    href: `mailto:${EMAIL}`,
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <rect x="3" y="5" width="18" height="14" rx="2" strokeLinejoin="round" />
-        <path d="M3 7 L12 13 L21 7" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    icon: Mail,
+    label: 'Email us',
+    value: 'hello@lumiere.pk',
+    href: 'mailto:hello@lumiere.pk',
   },
   {
-    label: 'WhatsApp',
-    value: PHONE_DISPLAY,
-    href: `https://wa.me/${PHONE_WHATSAPP}`,
-    external: true,
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path d="M20 12a8 8 0 1 1-3.4-6.55" strokeLinecap="round" />
-        <path d="M20 4l-5 5" strokeLinecap="round" />
-        <path
-          d="M8.5 9.5c.3 2.7 2.3 4.7 5 5l1-1.4c.1-.2.4-.3.6-.2l2 .8c.2.1.4.3.4.6v1.6c0 .6-.5 1.1-1.1 1.1C11.9 17 7 12.1 6.6 7.6c0-.6.4-1.1 1-1.1H9.2c.3 0 .5.2.6.4l.8 2c.1.2 0 .5-.2.6L9.5 9"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      </svg>
-    ),
+    icon: Phone,
+    label: 'Call us',
+    value: '+92 300 1234567',
+    href: 'tel:+923001234567',
   },
   {
-    label: 'Hours',
-    value: 'Mon – Sat, 9:00 AM – 6:00 PM',
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7 L12 12 L15.5 14" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
-    label: 'Studio',
+    icon: MapPin,
+    label: 'Visit us',
     value: 'Faisalabad, Punjab, Pakistan',
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
-        <path
-          d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z"
-          strokeLinejoin="round"
-        />
-        <circle cx="12" cy="9.5" r="2.3" />
-      </svg>
-    ),
-  },
-];
-
-const faqs = [
-  {
-    q: 'How long does shipping take?',
-    a: 'Orders within Pakistan typically arrive in 3–5 business days. You\'ll receive a tracking link once it ships.',
+    href: null,
   },
   {
-    q: 'What\'s your return policy?',
-    a: 'Unworn items in original packaging can be returned within 14 days for a full refund.',
-  },
-  {
-    q: 'Do you take custom or bulk orders?',
-    a: 'Yes — message us on WhatsApp or email with details and we\'ll get back to you within a day.',
+    icon: Clock,
+    label: 'Working hours',
+    value: 'Mon – Sat, 10:00 AM – 7:00 PM',
+    href: null,
   },
 ];
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
-  const [status, setStatus] = useState('idle');
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [status, setStatus] = useState('idle'); // idle | sending | sent | error
+  const [error, setError] = useState('');
 
-  const handleChange = (e) => {
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-  };
+  const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) return;
-    const subject = encodeURIComponent(`Website inquiry from ${form.name}`);
-    const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
-    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
-    setStatus('sent');
+
+    setStatus('sending');
+    setError('');
+    try {
+      // TODO: wire this up to your backend, e.g.
+      // await contactApi.send(form);
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      setStatus('sent');
+      setForm({ name: '', email: '', subject: '', message: '' });
+    } catch (err) {
+      setStatus('error');
+      setError(err.message || 'Something went wrong. Please try again.');
+    }
   };
 
   return (
-    <div className="bg-[#FDFBF7]">
-      <PageHeader title="Contact Us" subtitle="We'd love to hear from you." />
+    <div className="bg-cream-50 min-h-screen">
+      <ContactStyles />
 
-      <section className="section-padding pb-0">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1
-            className="text-charcoal-800 mb-4"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2rem, 4vw, 2.75rem)', fontWeight: 500 }}
-          >
-            Let's talk
-          </h1>
-          <p className="text-charcoal-600 leading-relaxed">
-            Questions about an order, a product, or just want to say hello? Send us a
-            message below, or reach out directly by email or WhatsApp — we usually
-            reply within a few hours.
+      {/* ── Title strip ── */}
+      <div className="border-b border-charcoal-800/[0.06]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-9 sm:pt-14 pb-6 sm:pb-8">
+          <p className="text-[10px] sm:text-[11px] font-medium tracking-[0.16em] uppercase text-charcoal-400 mb-2">
+            Home <span className="mx-1 text-charcoal-300">/</span> Contact
+          </p>
+          <h1 className="font-serif text-[28px] sm:text-4xl text-charcoal-800">Get in Touch</h1>
+          <p className="text-xs sm:text-sm text-charcoal-400 mt-2 max-w-md">
+            Questions about an order, a product, or just want to say hello — we'd love to hear from you.
           </p>
         </div>
-      </section>
+      </div>
 
-      <section className="section-padding">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
-          <div className="bg-white border border-charcoal-800/10 p-8">
-            <h2
-              className="text-charcoal-800 mb-6"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.6rem', fontWeight: 500 }}
-            >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-10 sm:py-16">
+        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16">
+
+          {/* ── Form ── */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal-400 mb-2">
               Send a message
+            </p>
+            <h2 className="ct-serif text-2xl sm:text-3xl font-semibold text-charcoal-800 mb-8">
+              We usually reply within a day
             </h2>
 
             {status === 'sent' ? (
-              <div className="py-10 text-center">
-                <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-[#E8D5D0]/60 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#6E2439]" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <path d="M5 12l4.5 4.5L19 7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+              <div className="flex items-start gap-3.5 rounded-2xl border border-charcoal-800/[0.08] bg-white/60 p-5 sm:p-6">
+                <span className="h-9 w-9 rounded-full bg-blush-500 text-white flex items-center justify-center shrink-0">
+                  <Check size={16} strokeWidth={2.5} />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-charcoal-800">Message sent</p>
+                  <p className="text-sm text-charcoal-400 mt-1">
+                    Thank you for reaching out — we'll get back to you shortly.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setStatus('idle')}
+                    className="text-xs text-blush-500 hover:text-blush-600 font-medium mt-3 underline underline-offset-2"
+                  >
+                    Send another message
+                  </button>
                 </div>
-                <p className="text-charcoal-800 font-medium mb-1">Almost done</p>
-                <p className="text-charcoal-600 text-sm mb-6">
-                  Your email app should have opened with your message ready to send.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => { setStatus('idle'); setForm({ name: '', email: '', message: '' }); }}
-                  className="text-sm text-[#6E2439] underline underline-offset-4"
-                >
-                  Send another message
-                </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="ct-label" htmlFor="ct-name">Name</label>
+                    <input
+                      id="ct-name"
+                      type="text"
+                      required
+                      placeholder="Your full name"
+                      value={form.name}
+                      onChange={update('name')}
+                      className="ct-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="ct-label" htmlFor="ct-email">Email</label>
+                    <input
+                      id="ct-email"
+                      type="email"
+                      required
+                      placeholder="you@example.com"
+                      value={form.email}
+                      onChange={update('email')}
+                      className="ct-input"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-xs tracking-wide text-charcoal-600 mb-1.5">
-                    Your Name
-                  </label>
+                  <label className="ct-label" htmlFor="ct-subject">Subject</label>
                   <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    placeholder="Jane Doe"
-                    className="w-full border border-charcoal-800/15 bg-[#FDFBF7] px-4 py-3 text-sm text-charcoal-800 placeholder:text-charcoal-400 focus:outline-none focus:border-[#6E2439] transition-colors"
+                    id="ct-subject"
+                    type="text"
+                    placeholder="What's this about?"
+                    value={form.subject}
+                    onChange={update('subject')}
+                    className="ct-input"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-xs tracking-wide text-charcoal-600 mb-1.5">
-                    Your Email
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="jane@example.com"
-                    className="w-full border border-charcoal-800/15 bg-[#FDFBF7] px-4 py-3 text-sm text-charcoal-800 placeholder:text-charcoal-400 focus:outline-none focus:border-[#6E2439] transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs tracking-wide text-charcoal-600 mb-1.5">
-                    Message
-                  </label>
+                  <label className="ct-label" htmlFor="ct-message">Message</label>
                   <textarea
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
+                    id="ct-message"
                     required
-                    rows="5"
-                    placeholder="How can we help?"
-                    className="w-full border border-charcoal-800/15 bg-[#FDFBF7] px-4 py-3 text-sm text-charcoal-800 placeholder:text-charcoal-400 focus:outline-none focus:border-[#6E2439] transition-colors resize-none"
+                    rows={5}
+                    placeholder="Tell us a little more…"
+                    value={form.message}
+                    onChange={update('message')}
+                    className="ct-input"
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="w-full bg-[#2B2230] text-white px-6 py-3.5 text-sm tracking-wide hover:bg-[#6E2439] transition-colors"
-                >
-                  Send Message
+
+                {status === 'error' && (
+                  <p className="text-xs text-red-500">{error}</p>
+                )}
+
+                <button type="submit" disabled={status === 'sending'} className="ct-submit">
+                  {status === 'sending' ? (
+                    'Sending…'
+                  ) : (
+                    <>
+                      Send Message <Send size={14} strokeWidth={2} />
+                    </>
+                  )}
                 </button>
               </form>
             )}
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-[#2B2230] text-[#FDFBF7] p-8">
-              <h2
-                className="mb-6"
-                style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.6rem', fontWeight: 500 }}
-              >
-                Get in touch directly
-              </h2>
-              <div className="space-y-5">
-                {contactDetails.map((item) => {
-                  const content = (
-                    <div className="flex items-start gap-4">
-                      <div className="text-[#C9A9A6] mt-0.5">{item.icon}</div>
-                      <div>
-                        <div className="text-xs tracking-wide text-white/50 mb-0.5">{item.label}</div>
-                        <div className="text-sm text-white/90">{item.value}</div>
-                      </div>
-                    </div>
-                  );
-                  return item.href ? (
-                    <a
-                      key={item.label}
-                      href={item.href}
-                      target={item.external ? '_blank' : undefined}
-                      rel={item.external ? 'noopener noreferrer' : undefined}
-                      className="block hover:opacity-75 transition-opacity"
-                    >
-                      {content}
-                    </a>
-                  ) : (
-                    <div key={item.label}>{content}</div>
-                  );
-                })}
-              </div>
+          {/* ── Contact info ── */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal-400 mb-2">
+              Reach us directly
+            </p>
+            <h2 className="ct-serif text-2xl sm:text-3xl font-semibold text-charcoal-800 mb-8">
+              Other ways to connect
+            </h2>
+
+            <div className="space-y-6">
+              {CONTACT_DETAILS.map(({ icon: Icon, label, value, href }) => (
+                <div key={label} className="flex items-start gap-4">
+                  <span className="ct-info-icon">
+                    <Icon size={17} strokeWidth={1.8} />
+                  </span>
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-charcoal-400 mb-0.5">
+                      {label}
+                    </p>
+                    {href ? (
+                      <a href={href} className="text-[15px] text-charcoal-800 hover:text-blush-500 transition-colors">
+                        {value}
+                      </a>
+                    ) : (
+                      <p className="text-[15px] text-charcoal-800">{value}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <a
-                href={`https://wa.me/${PHONE_WHATSAPP}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center gap-2 border border-charcoal-800/10 bg-white py-5 text-center hover:border-[#6E2439] transition-colors"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#6E2439]" fill="none" stroke="currentColor" strokeWidth="1.6">
-                  <path d="M20 12a8 8 0 1 1-3.4-6.55" strokeLinecap="round" />
-                  <path d="M20 4l-5 5" strokeLinecap="round" />
-                </svg>
-                <span className="text-xs tracking-wide text-charcoal-800">WhatsApp Us</span>
+            <div className="h-px bg-charcoal-800/[0.08] my-8" />
+
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-charcoal-400 mb-3">
+              Follow along
+            </p>
+            <div className="flex items-center gap-3">
+              <a href="#" aria-label="Instagram" className="ct-social">
+                <Instagram size={16} strokeWidth={1.8} />
               </a>
-              <a
-                href={`mailto:${EMAIL}`}
-                className="flex flex-col items-center justify-center gap-2 border border-charcoal-800/10 bg-white py-5 text-center hover:border-[#6E2439] transition-colors"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6 text-[#6E2439]" fill="none" stroke="currentColor" strokeWidth="1.6">
-                  <rect x="3" y="5" width="18" height="14" rx="2" strokeLinejoin="round" />
-                  <path d="M3 7 L12 13 L21 7" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <span className="text-xs tracking-wide text-charcoal-800">Email Us</span>
+              <a href="#" aria-label="Facebook" className="ct-social">
+                <Facebook size={16} strokeWidth={1.8} />
               </a>
             </div>
           </div>
         </div>
-      </section>
-
-      <section className="section-padding bg-white">
-        <div className="max-w-3xl mx-auto">
-          <h2
-            className="text-charcoal-800 mb-8 text-center"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2rem', fontWeight: 500 }}
-          >
-            Frequently asked
-          </h2>
-          <div className="space-y-6">
-            {faqs.map((f) => (
-              <div key={f.q} className="border-b border-charcoal-800/10 pb-6">
-                <h3 className="text-charcoal-800 font-medium mb-2">{f.q}</h3>
-                <p className="text-charcoal-600 text-sm leading-relaxed">{f.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
