@@ -1,23 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, X } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { userApi } from '../api/endpoints.js';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 
+/* ── Identical styling/markup language to the Shop page's ProductCard,
+   so a product looks exactly the same wherever it appears. Kept as its
+   own scoped block (not duplicated per-card). */
 function WishlistStyles() {
   return (
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap');
 
-      .wl-card-img {
+      .sp-card-img {
         position: relative;
         aspect-ratio: 3 / 4;
         overflow: hidden;
         background: #f5f2ee;
         border-radius: 10px;
       }
-      .wl-card-img::after {
+      .sp-card-img::after {
         content: '';
         position: absolute;
         inset: 0;
@@ -25,18 +28,18 @@ function WishlistStyles() {
         box-shadow: inset 0 0 0 1px rgba(26,26,26,0.06);
         pointer-events: none;
       }
-      .wl-card-img img {
+      .sp-card-img img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
         transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
       }
-      .wl-card:hover .wl-card-img img {
+      .sp-card:hover .sp-card-img img {
         transform: scale(1.045);
       }
 
-      .wl-sale-tag {
+      .sp-sale-tag {
         position: absolute;
         top: 8px;
         left: 8px;
@@ -51,7 +54,7 @@ function WishlistStyles() {
         color: #fff;
       }
 
-      .wl-remove-btn {
+      .sp-wish-btn {
         position: absolute;
         top: 8px;
         right: 8px;
@@ -67,36 +70,31 @@ function WishlistStyles() {
         justify-content: center;
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        color: #d9788a;
-        transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        transition: transform 0.2s ease, background 0.2s ease;
       }
-      .wl-remove-btn:hover {
-        background: #1a1a1a;
-        color: #fff;
-        transform: scale(1.07);
-      }
-      .wl-remove-btn:active { transform: scale(0.94); }
+      .sp-wish-btn:hover { transform: scale(1.07); }
+      .sp-wish-btn:active { transform: scale(0.94); }
 
-      .wl-price {
+      .sp-price {
         font-family: 'Cormorant Garamond', serif;
         font-weight: 600;
         letter-spacing: 0.01em;
         color: #1a1a1a;
       }
-      .wl-price-original {
+      .sp-price-original {
         font-family: 'Cormorant Garamond', serif;
         font-weight: 500;
         color: #a8a29a;
         text-decoration: line-through;
         text-decoration-color: rgba(168,162,154,0.6);
       }
-      .wl-price-divider {
+      .sp-price-divider {
         width: 1px;
         height: 10px;
         background: rgba(26,26,26,0.16);
         flex-shrink: 0;
       }
-      .wl-sale-caption {
+      .sp-sale-caption {
         font-size: 8.5px;
         font-weight: 600;
         letter-spacing: 0.14em;
@@ -107,13 +105,13 @@ function WishlistStyles() {
   );
 }
 
-function WishlistCard({ product, onRemove }) {
+function ProductCard({ product, onRemove }) {
   const onSale = product.compareAtPrice > product.price;
   const savedPct = onSale ? Math.round(100 - (product.price / product.compareAtPrice) * 100) : 0;
 
   return (
-    <div className="wl-card group">
-      <div className="wl-card-img">
+    <div className="sp-card group">
+      <div className="sp-card-img">
         <Link to={`/product/${product.slug}`} className="block h-full w-full">
           {product.images?.[0] ? (
             <img src={product.images[0]} alt={product.name} />
@@ -122,15 +120,17 @@ function WishlistCard({ product, onRemove }) {
           )}
         </Link>
 
-        {onSale && <span className="wl-sale-tag">−{savedPct}%</span>}
+        {onSale && <span className="sp-sale-tag">−{savedPct}%</span>}
 
+        {/* Already in the wishlist, so the heart shows filled — tap to remove,
+            same interaction language as the toggle on the Shop page. */}
         <button
           type="button"
           onClick={() => onRemove(product._id)}
           aria-label="Remove from wishlist"
-          className="wl-remove-btn"
+          className="sp-wish-btn"
         >
-          <X size={14} strokeWidth={2} />
+          <Heart size={13} strokeWidth={1.8} fill="#d9788a" className="text-blush-500" />
         </button>
       </div>
 
@@ -147,16 +147,16 @@ function WishlistCard({ product, onRemove }) {
           {product.name}
         </Link>
 
-        {onSale && <p className="wl-sale-caption mb-0.5">Sale · {savedPct}% off</p>}
+        {onSale && <p className="sp-sale-caption mb-0.5">Sale · {savedPct}% off</p>}
 
         <div className="flex items-baseline gap-1.5 sm:gap-2">
-          <p className="wl-price text-[15px] sm:text-[17px]">
+          <p className="sp-price text-[15px] sm:text-[17px]">
             Rs. {product.price?.toLocaleString()}
           </p>
           {onSale && (
             <>
-              <span className="wl-price-divider" />
-              <p className="wl-price-original text-[12px] sm:text-[13px]">
+              <span className="sp-price-divider" />
+              <p className="sp-price-original text-[12px] sm:text-[13px]">
                 Rs. {product.compareAtPrice?.toLocaleString()}
               </p>
             </>
@@ -222,7 +222,7 @@ export default function Wishlist() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-5 lg:gap-6 xl:gap-7">
             {items.map((product) => (
-              <WishlistCard key={product._id} product={product} onRemove={handleRemove} />
+              <ProductCard key={product._id} product={product} onRemove={handleRemove} />
             ))}
           </div>
         )}
